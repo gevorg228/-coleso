@@ -43,7 +43,9 @@ body {
 .layout {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(260px, 360px);
+  /* центр = ширина колеса; боковые колонки прижаты к нему, пустота уходит к внешним краям */
+  grid-template-columns: minmax(280px, 360px) auto minmax(260px, 360px);
+  justify-content: center;
   gap: 24px;
   align-items: start;
   align-content: start;
@@ -70,7 +72,7 @@ body {
   background: transparent; border: 0; padding: 0;
 }
 .wheel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; position: relative; z-index: 3; }
-.wheel-wrap { position: relative; width: 100%; max-width: min(100%, calc(100vh - 150px)); margin: 0 auto; }
+.wheel-wrap { position: relative; width: calc(100vh - 140px); max-width: 100%; margin: 0 auto; }
 .wheel-canvas { width: 100%; height: auto; display: block; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.45); cursor: pointer; }
 .center-gif {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
