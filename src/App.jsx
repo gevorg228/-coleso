@@ -245,11 +245,18 @@ export default function App() {
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
         <div className="top-right">
-          <label className="dur" title="Длительность прокрутки в секундах">
+          <label className="dur" title="Длительность прокрутки в секундах (целое число)">
             <input
-              type="number" min="1" max="60" step="0.5"
-              value={settings.duration ?? 4.5}
-              onChange={(e) => setSettings((s) => ({ ...s, duration: Number(e.target.value) || 1 }))}
+              type="text" inputMode="numeric"
+              value={settings.duration ?? 5}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, '')
+                setSettings((s) => ({ ...s, duration: v === '' ? '' : Number(v) }))
+              }}
+              onBlur={(e) => {
+                const n = parseInt(e.target.value, 10)
+                setSettings((s) => ({ ...s, duration: !n || n < 1 ? 5 : Math.min(n, 60) }))
+              }}
             />
             сек
           </label>
@@ -289,7 +296,7 @@ export default function App() {
             onResult={handleResult}
             onRequestSpin={handleSpin}
             centerImage={centerImage}
-            duration={(settings.duration ?? 4.5) * 1000}
+            duration={(Number(settings.duration) || 5) * 1000}
           />
         </section>
 
