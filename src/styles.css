@@ -46,9 +46,14 @@ body {
   border-radius: 9px; padding: 6px 8px; font-size: 14px; text-align: right; font-weight: 600;
 }
 .dur input:focus { outline: none; border-color: var(--accent); }
-.dur input { -moz-appearance: textfield; appearance: textfield; }
-.dur input::-webkit-outer-spin-button,
-.dur input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dur input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.dur input[type="number"]::-webkit-outer-spin-button,
+.dur input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0;
+  display: none;
+}
 
 .layout {
   flex: 1;
