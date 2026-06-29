@@ -1,0 +1,247 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import Wheel from './Wheel.jsx'
+
+const LS = {
+  lots: 'koleso.lots',
+  history: 'koleso.history',
+  settings: 'koleso.settings',
+}
+
+const PALETTE = [
+  '#ef4444', '#f59e0b', '#eab308', '#22c55e', '#10b981',
+  '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef',
+  '#ec4899', '#f43f5e', '#84cc16', '#14b8a6', '#0ea5e9',
+]
+
+let idCounter = 1
+const newId = () => `${Date.now().toString(36)}-${idCounter++}`
+const colorFor = (i) => PALETTE[i % PALETTE.length]
+
+function load(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+export default function App() {
+  const [lots, setLots] = useState(() =>
+    load(LS.lots, [
+      { id: newId(), label: 'Лот 1', color: colorFor(0), out: false },
+      { id: newId(), label: 'Лот 2', color: colorFor(1), out: false },
+      { id: newId(), label: 'Лот 3', color: colorFor(2), out: false },
+    ])
+  )
+  const [history, setHistory] = useState(() => load(LS.history, []))
+  const [settings, setSettings] = useState(() =>
+    load(LS.settings, { eliminate: true })
+  )
+
+  const [adding, setAdding] = useState('')
+  const [bulkOpen, setBulkOpen] = useState(false)
+  const [bulkText, setBulkText] = useState('')
+  const [winner, setWinner] = useState(null) // last winner lot
+  const [spinning, setSpinning] = useState(false)
+  const wheelRef = useRef(null)
+
+  useEffect(() => { localStorage.setItem(LS.lots, JSON.stringify(lots)) }, [lots])
+  useEffect(() => { localStorage.setItem(LS.history, JSON.stringify(history)) }, [history])
+  useEffect(() => { localStorage.setItem(LS.settings, JSON.stringify(settings)) }, [settings])
+
+  const active = useMemo(() => lots.filter((l) => !l.out), [lots])
+
+  function recolor(list) {
+    return list.map((l, i) => ({ ...l, color: colorFor(i) }))
+  }
+
+  function addLot(label) {
+    const text = label.trim()
+    if (!text) return
+    setLots((prev) => recolor([...prev, { id: newId(), label: text, out: false }]))
+  }
+
+  function updateLot(id, label) {
+    setLots((prev) => prev.map((l) => (l.id === id ? { ...l, label } : l)))
+  }
+
+  function removeLot(id) {
+    setLots((prev) => recolor(prev.filter((l) => l.id !== id)))
+  }
+
+  function clearAll() {
+    if (!confirm('Удалить все лоты?')) return
+    setLots([])
+    setWinner(null)
+  }
+
+  function returnAll() {
+    setLots((prev) => recolor(prev.map((l) => ({ ...l, out: false }))))
+    setWinner(null)
+  }
+
+  function applyBulk(mode) {
+    const lines = bulkText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (lines.length === 0) return
+    const fresh = lines.map((label) => ({ id: newId(), label, out: false }))
+    setLots((prev) => recolor(mode === 'replace' ? fresh : [...prev, ...fresh]))
+    setBulkText('')
+    setBulkOpen(false)
+    setWinner(null)
+  }
+
+  function handleSpin() {
+    if (spinning || active.length === 0) return
+    setWinner(null)
+    setSpinning(true)
+    wheelRef.current?.spin()
+  }
+
+  function handleResult(index) {
+    const lot = active[index]
+    setSpinning(false)
+    if (!lot) return
+    setWinner(lot)
+    setHistory((prev) => [
+      { id: newId(), label: lot.label, color: lot.color, time: new Date().toISOString() },
+      ...prev,
+    ].slice(0, 200))
+    if (settings.eliminate) {
+      setLots((prev) => recolor(
+        prev.map((l) => (l.id === lot.id ? { ...l, out: true } : l))
+      ))
+    }
+  }
+
+  const lastOneLeft = settings.eliminate && active.length === 1
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <h1>🎡 Колесо рандома</h1>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={settings.eliminate}
+            onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
+          />
+          <span>На выбывание (победитель убирается)</span>
+        </label>
+      </header>
+
+      <div className="layout">
+        {/* WHEEL */}
+        <section className="panel wheel-panel">
+          <Wheel ref={wheelRef} segments={active} onResult={handleResult} />
+
+          <button
+            className="spin-btn"
+            onClick={handleSpin}
+            disabled={spinning || active.length === 0}
+          >
+            {spinning ? 'Крутится…' : active.length === 0 ? 'Нет лотов' : 'КРУТИТЬ'}
+          </button>
+
+          <div className="status">
+            {winner ? (
+              <div className="winner-banner" style={{ borderColor: winner.color }}>
+                {lastOneLeft ? '🏆 Остался последний: ' : '🎉 Выпало: '}
+                <b>{winner.label}</b>
+              </div>
+            ) : (
+              <div className="muted">Активных лотов: {active.length} из {lots.length}</div>
+            )}
+          </div>
+        </section>
+
+        {/* EDITOR */}
+        <section className="panel editor-panel">
+          <div className="panel-head">
+            <h2>Лоты ({lots.length})</h2>
+            <div className="head-actions">
+              <button className="ghost" onClick={() => setBulkOpen((v) => !v)}>Списком</button>
+              {settings.eliminate && (
+                <button className="ghost" onClick={returnAll}>Вернуть всех</button>
+              )}
+              <button className="ghost danger" onClick={clearAll}>Очистить</button>
+            </div>
+          </div>
+
+          {bulkOpen && (
+            <div className="bulk">
+              <textarea
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+                placeholder={'Вставьте список — один лот в строке\nНапример:\nАня\nБорис\nВера'}
+                rows={6}
+              />
+              <div className="bulk-actions">
+                <button onClick={() => applyBulk('append')}>Добавить</button>
+                <button onClick={() => applyBulk('replace')}>Заменить весь список</button>
+              </div>
+            </div>
+          )}
+
+          <form
+            className="add-row"
+            onSubmit={(e) => { e.preventDefault(); addLot(adding); setAdding('') }}
+          >
+            <input
+              value={adding}
+              onChange={(e) => setAdding(e.target.value)}
+              placeholder="Новый лот и Enter…"
+            />
+            <button type="submit">＋</button>
+          </form>
+
+          <ul className="lot-list">
+            {lots.map((l) => (
+              <li key={l.id} className={l.out ? 'lot out' : 'lot'}>
+                <span className="dot" style={{ background: l.color }} />
+                <input
+                  value={l.label}
+                  onChange={(e) => updateLot(l.id, e.target.value)}
+                />
+                {l.out && <span className="tag">выбыл</span>}
+                <button className="x" onClick={() => removeLot(l.id)} title="Удалить">✕</button>
+              </li>
+            ))}
+            {lots.length === 0 && <li className="empty">Список пуст</li>}
+          </ul>
+        </section>
+
+        {/* HISTORY */}
+        <section className="panel history-panel">
+          <div className="panel-head">
+            <h2>История ({history.length})</h2>
+            <button
+              className="ghost danger"
+              onClick={() => { if (confirm('Очистить историю?')) setHistory([]) }}
+            >
+              Очистить
+            </button>
+          </div>
+          <ol className="history-list">
+            {history.map((h) => (
+              <li key={h.id}>
+                <span className="dot" style={{ background: h.color || '#888' }} />
+                <span className="h-label">{h.label}</span>
+                <span className="h-time">
+                  {new Date(h.time).toLocaleString('ru-RU', {
+                    day: '2-digit', month: '2-digit',
+                    hour: '2-digit', minute: '2-digit',
+                  })}
+                </span>
+              </li>
+            ))}
+            {history.length === 0 && <li className="empty">Пока нет победителей</li>}
+          </ol>
+        </section>
+      </div>
+    </div>
+  )
+}
