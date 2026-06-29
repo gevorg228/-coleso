@@ -181,7 +181,7 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 /* modal */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 50;
-  background: rgba(5, 8, 14, 0.92); backdrop-filter: blur(8px);
+  background: rgba(6, 9, 16, 0.66); backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center;
   animation: fade .15s ease;
 }
@@ -200,8 +200,8 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
   transition: transform .08s ease, filter .15s ease;
 }
 .m-btn:hover { transform: translateY(-1px); }
-.m-yes { color: #fff; background: linear-gradient(135deg, #6366f1, #d946ef); box-shadow: 0 6px 18px rgba(99,102,241,0.4); }
-.m-yes:hover { filter: brightness(1.08); }
+.m-yes { color: #fff; background: #6366f1; }
+.m-yes:hover { background: #4f52e0; }
 .m-no { color: var(--text); background: var(--panel); border-color: var(--line); }
 .m-no:hover { border-color: var(--danger); color: #fca5a5; }
 @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
