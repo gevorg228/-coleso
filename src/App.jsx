@@ -173,6 +173,25 @@ export default function App() {
     setWinner(null)
   }
 
+  // Keyboard: Esc closes dialogs, Space spins the wheel.
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        setModal(null)
+        setGifOpen(false)
+        return
+      }
+      if (e.code === 'Space' || e.key === ' ') {
+        const tag = document.activeElement?.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || modal || gifOpen) return
+        e.preventDefault()
+        handleSpin()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [modal, gifOpen, spinning, active, settings])
+
   function pushHistory(lot) {
     setHistory((prev) => [
       { id: newId(), label: lot.label, color: lot.color, time: new Date().toISOString() },
@@ -222,6 +241,14 @@ export default function App() {
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
         <div className="top-right">
+          <label className="dur" title="Длительность прокрутки в секундах">
+            <input
+              type="number" min="1" max="60" step="0.5"
+              value={settings.duration ?? 4.5}
+              onChange={(e) => setSettings((s) => ({ ...s, duration: Number(e.target.value) || 1 }))}
+            />
+            сек
+          </label>
           <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
             🖼 Гифка
           </button>
@@ -258,6 +285,7 @@ export default function App() {
             onResult={handleResult}
             onRequestSpin={handleSpin}
             centerImage={centerImage}
+            duration={(settings.duration ?? 4.5) * 1000}
           />
         </section>
 

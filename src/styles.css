@@ -40,6 +40,13 @@ body {
 }
 .gif-btn:hover { border-color: var(--accent); }
 
+.dur { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+.dur input {
+  width: 58px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+  border-radius: 9px; padding: 6px 8px; font-size: 14px; text-align: right; font-weight: 600;
+}
+.dur input:focus { outline: none; border-color: var(--accent); }
+
 .layout {
   flex: 1;
   display: flex;
@@ -200,7 +207,7 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
   transition: transform .08s ease, filter .15s ease;
 }
 .m-btn:hover { transform: translateY(-1px); }
-.m-btn:focus { outline: none; box-shadow: none; }
+.m-btn:focus, .m-btn:focus-visible { outline: none; box-shadow: none; }
 .m-yes { color: #fff; background: #6366f1; }
 .m-yes:hover { background: #4f52e0; }
 .m-no { color: var(--text); background: var(--panel); border-color: var(--line); }
