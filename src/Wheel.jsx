@@ -142,7 +142,6 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, onRequestSpin, cen
         height={900}
         className="wheel-canvas"
         onClick={() => { if (!spinning) onRequestSpin?.() }}
-        title="Нажми, чтобы крутить"
       />
       {centerImage && (
         <img className="center-gif" src={centerImage} alt="" style={{ width: `${HUB * 100}%` }} />

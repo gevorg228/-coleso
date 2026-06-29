@@ -69,7 +69,7 @@ body {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
   background: transparent; border: 0; padding: 0;
 }
-.wheel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.wheel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; position: relative; z-index: 3; }
 .wheel-wrap { position: relative; width: 100%; max-width: min(100%, 78vh); margin: 0 auto; }
 .wheel-canvas { width: 100%; height: auto; display: block; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.45); cursor: pointer; }
 .center-gif {
