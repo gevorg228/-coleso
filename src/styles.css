@@ -182,7 +182,9 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
   background: var(--bg) !important; border: 1px solid var(--line) !important;
   border-radius: 7px; color: #fbbf24 !important; font-weight: 600;
 }
-.lot-amount::-webkit-inner-spin-button { opacity: .4; }
+.lot-amount { -moz-appearance: textfield; appearance: textfield; }
+.lot-amount::-webkit-outer-spin-button,
+.lot-amount::-webkit-inner-spin-button { -webkit-appearance: none !important; appearance: none !important; margin: 0; display: none; }
 .lot input:focus { outline: none; border-bottom-color: var(--accent); }
 .lot.out .lot-name { text-decoration: line-through; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
