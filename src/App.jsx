@@ -202,15 +202,17 @@ export default function App() {
     }
 
     // Elimination mode: the lot under the pointer is ELIMINATED.
-    setLots((prev) => recolor(prev.map((l) => (l.id === lot.id ? { ...l, out: true } : l))))
     const remaining = active.filter((l) => l.id !== lot.id)
     if (remaining.length === 1) {
-      // Last one standing — this is the winner of the whole cycle. Record it once.
+      // Last one standing — winner of the round. Record it once, then bring
+      // everyone back so the next round starts fresh with all lots.
       const survivor = remaining[0]
       setWinner({ ...survivor, kind: 'survivor' })
       pushHistory(survivor)
+      setLots((prev) => recolor(prev.map((l) => ({ ...l, out: false }))))
     } else {
-      // Just announce who dropped out; do not record eliminated lots.
+      // Eliminate the landed lot; do not record it.
+      setLots((prev) => recolor(prev.map((l) => (l.id === lot.id ? { ...l, out: true } : l))))
       setWinner({ ...lot, kind: 'out' })
     }
   }
@@ -219,40 +221,35 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
-        <div className="top-right">
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={settings.eliminate}
-              onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
-            />
-            <span>На выбывание</span>
-          </label>
-          <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
-            🖼 Гифка
-          </button>
-          {centerImage && (
-            <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
-          )}
-          <button
-            className="spin-btn"
-            onClick={handleSpin}
-            disabled={spinning || active.length === 0 || (settings.eliminate && active.length === 1)}
-          >
-            {spinning
-              ? 'Крутится…'
-              : active.length === 0
-                ? 'Нет лотов'
-                : settings.eliminate && active.length === 1
-                  ? '🏆 Победитель'
-                  : 'КРУТИТЬ'}
-          </button>
-        </div>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={settings.eliminate}
+            onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
+          />
+          <span>На выбывание</span>
+        </label>
       </header>
 
       <div className="layout">
         {/* WHEEL */}
         <section className="panel wheel-panel">
+          <div className="wheel-controls">
+            <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
+              🖼 Гифка
+            </button>
+            {centerImage && (
+              <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
+            )}
+            <button
+              className="spin-btn"
+              onClick={handleSpin}
+              disabled={spinning || active.length === 0}
+            >
+              {spinning ? 'Крутится…' : active.length === 0 ? 'Нет лотов' : 'КРУТИТЬ'}
+            </button>
+          </div>
+
           <Wheel
             ref={wheelRef}
             segments={active}
@@ -331,7 +328,7 @@ export default function App() {
                 />
                 {l.out && (
                   <button className="return-btn" onClick={() => returnOne(l.id)} title="Вернуть в колесо">
-                    ↩ вернуть
+                    →
                   </button>
                 )}
                 <button className="x" onClick={() => removeLot(l.id)} title="Удалить">✕</button>
