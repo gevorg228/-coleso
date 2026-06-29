@@ -389,7 +389,6 @@ export default function App() {
                   <button className="m-btn m-no" onClick={() => setModal(null)}>Отмена</button>
                   <button
                     className="m-btn m-yes"
-                    autoFocus
                     onClick={() => { modal.onConfirm?.(); setModal(null) }}
                   >
                     Да

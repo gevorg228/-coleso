@@ -200,6 +200,7 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
   transition: transform .08s ease, filter .15s ease;
 }
 .m-btn:hover { transform: translateY(-1px); }
+.m-btn:focus { outline: none; box-shadow: none; }
 .m-yes { color: #fff; background: #6366f1; }
 .m-yes:hover { background: #4f52e0; }
 .m-no { color: var(--text); background: var(--panel); border-color: var(--line); }
