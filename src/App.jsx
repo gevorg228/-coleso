@@ -176,8 +176,17 @@ export default function App() {
     setWinner(null)
   }
 
+  function pushHistory(lot) {
+    setHistory((prev) => [
+      { id: newId(), label: lot.label, color: lot.color, time: new Date().toISOString() },
+      ...prev,
+    ].slice(0, 200))
+  }
+
   function handleSpin() {
     if (spinning || active.length === 0) return
+    // In elimination mode, a single remaining lot is already the winner — nothing to spin.
+    if (settings.eliminate && active.length === 1) return
     setWinner(null)
     setSpinning(true)
     wheelRef.current?.spin()
@@ -187,19 +196,27 @@ export default function App() {
     const lot = active[index]
     setSpinning(false)
     if (!lot) return
-    setWinner(lot)
-    setHistory((prev) => [
-      { id: newId(), label: lot.label, color: lot.color, time: new Date().toISOString() },
-      ...prev,
-    ].slice(0, 200))
-    if (settings.eliminate) {
-      setLots((prev) => recolor(
-        prev.map((l) => (l.id === lot.id ? { ...l, out: true } : l))
-      ))
+
+    if (!settings.eliminate) {
+      // Normal mode: the lot under the pointer is the winner.
+      setWinner({ ...lot, kind: 'win' })
+      pushHistory(lot)
+      return
+    }
+
+    // Elimination mode: the lot under the pointer is ELIMINATED.
+    setLots((prev) => recolor(prev.map((l) => (l.id === lot.id ? { ...l, out: true } : l))))
+    const remaining = active.filter((l) => l.id !== lot.id)
+    if (remaining.length === 1) {
+      // Last one standing — this is the winner of the whole cycle. Record it once.
+      const survivor = remaining[0]
+      setWinner({ ...survivor, kind: 'survivor' })
+      pushHistory(survivor)
+    } else {
+      // Just announce who dropped out; do not record eliminated lots.
+      setWinner({ ...lot, kind: 'out' })
     }
   }
-
-  const lastOneLeft = settings.eliminate && active.length === 1
 
   return (
     <div className="app">
@@ -208,9 +225,15 @@ export default function App() {
         <button
           className="spin-btn"
           onClick={handleSpin}
-          disabled={spinning || active.length === 0}
+          disabled={spinning || active.length === 0 || (settings.eliminate && active.length === 1)}
         >
-          {spinning ? 'Крутится…' : active.length === 0 ? 'Нет лотов' : 'КРУТИТЬ'}
+          {spinning
+            ? 'Крутится…'
+            : active.length === 0
+              ? 'Нет лотов'
+              : settings.eliminate && active.length === 1
+                ? '🏆 Победитель'
+                : 'КРУТИТЬ'}
         </button>
         <div className="top-right">
           <label className="gif-btn" title="Гифка/картинка в центр колеса">
@@ -243,8 +266,10 @@ export default function App() {
           />
 
           {winner && (
-            <div className="winner-banner" style={{ borderColor: winner.color }}>
-              {lastOneLeft ? '🏆 Остался последний: ' : '🎉 Выпало: '}
+            <div className={'winner-banner' + (winner.kind === 'out' ? ' out' : '')} style={{ borderColor: winner.color }}>
+              {winner.kind === 'survivor' && '🏆 Победитель: '}
+              {winner.kind === 'out' && '❌ Выбывает: '}
+              {winner.kind === 'win' && '🎉 Выпало: '}
               <b>{winner.label}</b>
             </div>
           )}

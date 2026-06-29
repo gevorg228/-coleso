@@ -104,6 +104,7 @@ body {
   background: var(--panel-2); border: 2px solid; font-size: 18px;
 }
 .winner-banner b { font-size: 20px; }
+.winner-banner.out { opacity: .85; }
 
 /* panels head */
 .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
