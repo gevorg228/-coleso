@@ -19,7 +19,7 @@ body {
 }
 
 .app {
-  max-width: 1480px; margin: 0 auto; padding: 18px;
+  max-width: none; margin: 0; padding: 18px 24px;
   min-height: 100vh; display: flex; flex-direction: column;
 }
 
@@ -35,10 +35,10 @@ body {
 .layout {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.8fr) minmax(240px, 0.95fr);
-  gap: 16px;
-  align-items: center;
-  align-content: center;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(260px, 360px);
+  gap: 24px;
+  align-items: start;
+  align-content: start;
 }
 /* order: editor (left) | wheel (center) | history (right) */
 .editor-panel { order: 1; }
@@ -56,9 +56,12 @@ body {
   padding: 16px;
 }
 
-/* wheel */
-.wheel-panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.wheel-wrap { position: relative; width: 100%; max-width: 640px; margin: 0 auto; }
+/* wheel — no panel box around it */
+.wheel-panel {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  background: transparent; border: 0; padding: 0;
+}
+.wheel-wrap { position: relative; width: 100%; max-width: 760px; margin: 0 auto; }
 .wheel-canvas { width: 100%; height: auto; display: block; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.45); }
 .pointer {
   position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
