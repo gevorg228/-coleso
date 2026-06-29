@@ -62,7 +62,11 @@ export default function App() {
   const [bulkText, setBulkText] = useState('')
   const [winner, setWinner] = useState(null) // last winner lot
   const [spinning, setSpinning] = useState(false)
+  const [modal, setModal] = useState(null) // { message, onConfirm? , alert? }
   const wheelRef = useRef(null)
+
+  const askConfirm = (message, onConfirm) => setModal({ message, onConfirm })
+  const showAlert = (message) => setModal({ message, alert: true })
 
   useEffect(() => { localStorage.setItem(LS.lots, JSON.stringify(lots)) }, [lots])
   useEffect(() => { localStorage.setItem(LS.history, JSON.stringify(history)) }, [history])
@@ -72,7 +76,7 @@ export default function App() {
       if (centerImage) localStorage.setItem(LS.center, centerImage)
       else localStorage.removeItem(LS.center)
     } catch {
-      alert('Гифка слишком большая, чтобы сохранить её в браузере (лимит ~5 МБ). Она будет работать до перезагрузки страницы.')
+      showAlert('Гифка слишком большая, чтобы сохранить её в браузере (лимит ~5 МБ). Она будет работать до перезагрузки страницы.')
     }
   }, [centerImage])
 
@@ -80,12 +84,16 @@ export default function App() {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
-    if (file.size > 8 * 1024 * 1024) {
-      if (!confirm('Файл больше 8 МБ — он может не сохраниться в браузере. Всё равно использовать?')) return
+    const apply = () => {
+      const reader = new FileReader()
+      reader.onload = () => setCenterImage(reader.result)
+      reader.readAsDataURL(file)
     }
-    const reader = new FileReader()
-    reader.onload = () => setCenterImage(reader.result)
-    reader.readAsDataURL(file)
+    if (file.size > 8 * 1024 * 1024) {
+      askConfirm('Файл больше 8 МБ — он может не сохраниться в браузере. Всё равно использовать?', apply)
+    } else {
+      apply()
+    }
   }
 
   const active = useMemo(() => lots.filter((l) => !l.out), [lots])
@@ -114,9 +122,7 @@ export default function App() {
   }
 
   function clearAll() {
-    if (!confirm('Удалить все лоты?')) return
-    setLots([])
-    setWinner(null)
+    askConfirm('Удалить все лоты?', () => { setLots([]); setWinner(null) })
   }
 
   function returnAll() {
@@ -139,7 +145,7 @@ export default function App() {
         try {
           data = JSON.parse('[' + trimmed.replace(/,\s*$/, '') + ']')
         } catch (e) {
-          alert('Не получилось разобрать JSON: ' + e.message)
+          showAlert('Не получилось разобрать JSON: ' + e.message)
           return null
         }
       }
@@ -347,7 +353,7 @@ export default function App() {
             <h2>История ({history.length})</h2>
             <button
               className="ghost danger"
-              onClick={() => { if (confirm('Очистить историю?')) setHistory([]) }}
+              onClick={() => askConfirm('Очистить историю?', () => setHistory([]))}
             >
               Очистить
             </button>
@@ -369,6 +375,30 @@ export default function App() {
           </ol>
         </section>
       </div>
+
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-msg">{modal.message}</div>
+            <div className="modal-actions">
+              {modal.alert ? (
+                <button className="m-btn m-yes" onClick={() => setModal(null)}>Понятно</button>
+              ) : (
+                <>
+                  <button className="m-btn m-no" onClick={() => setModal(null)}>Отмена</button>
+                  <button
+                    className="m-btn m-yes"
+                    autoFocus
+                    onClick={() => { modal.onConfirm?.(); setModal(null) }}
+                  >
+                    Да
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

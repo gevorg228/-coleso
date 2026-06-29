@@ -166,6 +166,35 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 .x:hover { color: var(--danger); }
 .empty { color: var(--muted); padding: 10px; text-align: center; font-size: 14px; }
 
+/* modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(6, 9, 16, 0.66); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fade .15s ease;
+}
+.modal {
+  width: min(420px, 92vw);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line); border-radius: 18px;
+  padding: 24px; box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+  animation: pop .18s cubic-bezier(.2,.9,.3,1.3);
+}
+.modal-msg { font-size: 17px; line-height: 1.45; margin-bottom: 22px; text-align: center; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.m-btn {
+  min-width: 110px; padding: 11px 18px; font-size: 15px; font-weight: 700;
+  border-radius: 11px; cursor: pointer; border: 1px solid transparent;
+  transition: transform .08s ease, filter .15s ease;
+}
+.m-btn:hover { transform: translateY(-1px); }
+.m-yes { color: #fff; background: linear-gradient(135deg, #6366f1, #d946ef); box-shadow: 0 6px 18px rgba(99,102,241,0.4); }
+.m-yes:hover { filter: brightness(1.08); }
+.m-no { color: var(--text); background: var(--panel); border-color: var(--line); }
+.m-no:hover { border-color: var(--danger); color: #fca5a5; }
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pop { from { opacity: 0; transform: scale(.9) translateY(8px) } to { opacity: 1; transform: none } }
+
 /* history */
 .history-list { counter-reset: h; }
 .history-list li { display: flex; align-items: center; gap: 8px; padding: 7px 6px; border-bottom: 1px solid var(--line); font-size: 14px; }
