@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Wheel from './Wheel.jsx'
+import GifPicker from './GifPicker.jsx'
 
 const LS = {
   lots: 'koleso.lots',
@@ -63,6 +64,7 @@ export default function App() {
   const [winner, setWinner] = useState(null) // last winner lot
   const [spinning, setSpinning] = useState(false)
   const [modal, setModal] = useState(null) // { message, onConfirm? , alert? }
+  const [gifOpen, setGifOpen] = useState(false)
   const wheelRef = useRef(null)
 
   const askConfirm = (message, onConfirm) => setModal({ message, onConfirm })
@@ -76,25 +78,9 @@ export default function App() {
       if (centerImage) localStorage.setItem(LS.center, centerImage)
       else localStorage.removeItem(LS.center)
     } catch {
-      showAlert('Гифка слишком большая, чтобы сохранить её в браузере (лимит ~5 МБ). Она будет работать до перезагрузки страницы.')
+      /* centerImage is now a short Blob URL, so quota is not a concern */
     }
   }, [centerImage])
-
-  function onPickGif(e) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    const apply = () => {
-      const reader = new FileReader()
-      reader.onload = () => setCenterImage(reader.result)
-      reader.readAsDataURL(file)
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      askConfirm('Файл больше 8 МБ — он может не сохраниться в браузере. Всё равно использовать?', apply)
-    } else {
-      apply()
-    }
-  }
 
   const active = useMemo(() => lots.filter((l) => !l.out), [lots])
 
@@ -242,10 +228,9 @@ export default function App() {
                 : 'КРУТИТЬ'}
         </button>
         <div className="top-right">
-          <label className="gif-btn" title="Гифка/картинка в центр колеса">
-            <input type="file" accept="image/*,image/gif" onChange={onPickGif} hidden />
+          <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
             🖼 Гифка
-          </label>
+          </button>
           {centerImage && (
             <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
           )}
@@ -375,6 +360,14 @@ export default function App() {
           </ol>
         </section>
       </div>
+
+      {gifOpen && (
+        <GifPicker
+          current={centerImage}
+          onSelect={(url) => setCenterImage(url)}
+          onClose={() => setGifOpen(false)}
+        />
+      )}
 
       {modal && (
         <div className="modal-overlay" onClick={() => setModal(null)}>

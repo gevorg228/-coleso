@@ -195,6 +195,45 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes pop { from { opacity: 0; transform: scale(.9) translateY(8px) } to { opacity: 1; transform: none } }
 
+/* gif picker */
+.gif-modal {
+  width: min(720px, 94vw); max-height: 86vh; overflow: auto;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line); border-radius: 18px; padding: 20px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+  animation: pop .18s cubic-bezier(.2,.9,.3,1.3);
+}
+.gif-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.gif-modal-head h3 { margin: 0; font-size: 18px; }
+.x.big { font-size: 18px; width: 34px; height: 34px; border-radius: 9px; background: var(--panel); border: 1px solid var(--line); }
+.x.big:hover { border-color: var(--danger); color: #fca5a5; }
+.gif-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; }
+
+.gif-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.gif-tile {
+  position: relative; aspect-ratio: 1 / 1; border-radius: 14px; overflow: hidden;
+  background: var(--bg); border: 2px solid var(--line); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+  color: var(--text); font-size: 14px; transition: border-color .15s, transform .08s;
+}
+.gif-tile:hover { transform: translateY(-2px); border-color: var(--accent); }
+.gif-tile.active { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.35); }
+.gif-tile img { width: 100%; height: 100%; object-fit: cover; }
+.gif-tile.upload, .gif-tile.none, .gif-tile.muted-tile {
+  border-style: dashed; flex-direction: column; gap: 6px; text-align: center; padding: 8px;
+}
+.gif-tile.upload { background: var(--panel-2); font-weight: 700; }
+.gif-tile.upload.busy { opacity: .6; cursor: progress; }
+.gif-tile.muted-tile { color: var(--muted); cursor: default; border-style: dashed; }
+.gif-tile .del {
+  position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(8,11,18,0.8); border-radius: 7px; font-size: 13px; color: #fff;
+  opacity: 0; transition: opacity .15s;
+}
+.gif-tile:hover .del { opacity: 1; }
+.gif-tile .del:hover { background: var(--danger); }
+
 /* history */
 .history-list { counter-reset: h; }
 .history-list li { display: flex; align-items: center; gap: 8px; padding: 7px 6px; border-bottom: 1px solid var(--line); font-size: 14px; }
