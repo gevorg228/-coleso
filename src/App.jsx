@@ -5,6 +5,7 @@ const LS = {
   lots: 'koleso.lots',
   history: 'koleso.history',
   settings: 'koleso.settings',
+  center: 'koleso.center',
 }
 
 const PALETTE = [
@@ -52,6 +53,9 @@ export default function App() {
   const [settings, setSettings] = useState(() =>
     load(LS.settings, { eliminate: true })
   )
+  const [centerImage, setCenterImage] = useState(() => {
+    try { return localStorage.getItem(LS.center) || null } catch { return null }
+  })
 
   const [adding, setAdding] = useState('')
   const [bulkOpen, setBulkOpen] = useState(false)
@@ -63,6 +67,26 @@ export default function App() {
   useEffect(() => { localStorage.setItem(LS.lots, JSON.stringify(lots)) }, [lots])
   useEffect(() => { localStorage.setItem(LS.history, JSON.stringify(history)) }, [history])
   useEffect(() => { localStorage.setItem(LS.settings, JSON.stringify(settings)) }, [settings])
+  useEffect(() => {
+    try {
+      if (centerImage) localStorage.setItem(LS.center, centerImage)
+      else localStorage.removeItem(LS.center)
+    } catch {
+      alert('Гифка слишком большая, чтобы сохранить её в браузере (лимит ~5 МБ). Она будет работать до перезагрузки страницы.')
+    }
+  }, [centerImage])
+
+  function onPickGif(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (file.size > 8 * 1024 * 1024) {
+      if (!confirm('Файл больше 8 МБ — он может не сохраниться в браузере. Всё равно использовать?')) return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setCenterImage(reader.result)
+    reader.readAsDataURL(file)
+  }
 
   const active = useMemo(() => lots.filter((l) => !l.out), [lots])
 
@@ -174,39 +198,49 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={settings.eliminate}
-            onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
-          />
-          <span>На выбывание (победитель убирается)</span>
-        </label>
+        <button
+          className="spin-btn"
+          onClick={handleSpin}
+          disabled={spinning || active.length === 0}
+        >
+          {spinning ? 'Крутится…' : active.length === 0 ? 'Нет лотов' : 'КРУТИТЬ'}
+        </button>
+        <div className="top-right">
+          <label className="gif-btn" title="Гифка/картинка в центр колеса">
+            <input type="file" accept="image/*,image/gif" onChange={onPickGif} hidden />
+            🖼 Гифка
+          </label>
+          {centerImage && (
+            <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
+          )}
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.eliminate}
+              onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
+            />
+            <span>На выбывание</span>
+          </label>
+        </div>
       </header>
 
       <div className="layout">
         {/* WHEEL */}
         <section className="panel wheel-panel">
-          <Wheel ref={wheelRef} segments={active} onResult={handleResult} />
+          <Wheel
+            ref={wheelRef}
+            segments={active}
+            onResult={handleResult}
+            onRequestSpin={handleSpin}
+            centerImage={centerImage}
+          />
 
-          <button
-            className="spin-btn"
-            onClick={handleSpin}
-            disabled={spinning || active.length === 0}
-          >
-            {spinning ? 'Крутится…' : active.length === 0 ? 'Нет лотов' : 'КРУТИТЬ'}
-          </button>
-
-          <div className="status">
-            {winner ? (
-              <div className="winner-banner" style={{ borderColor: winner.color }}>
-                {lastOneLeft ? '🏆 Остался последний: ' : '🎉 Выпало: '}
-                <b>{winner.label}</b>
-              </div>
-            ) : (
-              <div className="muted">Активных лотов: {active.length} из {lots.length}</div>
-            )}
-          </div>
+          {winner && (
+            <div className="winner-banner" style={{ borderColor: winner.color }}>
+              {lastOneLeft ? '🏆 Остался последний: ' : '🎉 Выпало: '}
+              <b>{winner.label}</b>
+            </div>
+          )}
         </section>
 
         {/* EDITOR */}

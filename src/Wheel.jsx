@@ -4,7 +4,9 @@ const TAU = Math.PI * 2
 
 // Draws the wheel and handles the spin animation.
 // `segments` is an array of { id, label, color }. Calls onResult(index) when a spin finishes.
-const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 }, ref) {
+const HUB = 0.30 // hub radius as a fraction of the wheel radius
+
+const Wheel = forwardRef(function Wheel({ segments, onResult, onRequestSpin, centerImage, duration = 4500 }, ref) {
   const canvasRef = useRef(null)
   const rotationRef = useRef(0)
   const rafRef = useRef(0)
@@ -118,13 +120,13 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
       ctx.restore()
     }
 
-    // hub
+    // hub (bigger — the gif sits on top of it)
     ctx.beginPath()
-    ctx.arc(cx, cy, r * 0.12, 0, TAU)
+    ctx.arc(cx, cy, r * HUB, 0, TAU)
     ctx.fillStyle = '#0e1320'
     ctx.fill()
     ctx.strokeStyle = '#3a455f'
-    ctx.lineWidth = 3
+    ctx.lineWidth = 4
     ctx.stroke()
   }
 
@@ -134,7 +136,17 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
   return (
     <div className="wheel-wrap">
       <div className="pointer" />
-      <canvas ref={canvasRef} width={760} height={760} className="wheel-canvas" />
+      <canvas
+        ref={canvasRef}
+        width={900}
+        height={900}
+        className="wheel-canvas"
+        onClick={() => { if (!spinning) onRequestSpin?.() }}
+        title="Нажми, чтобы крутить"
+      />
+      {centerImage && (
+        <img className="center-gif" src={centerImage} alt="" style={{ width: `${HUB * 100}%` }} />
+      )}
     </div>
   )
 })
