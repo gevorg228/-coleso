@@ -134,7 +134,7 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
   return (
     <div className="wheel-wrap">
       <div className="pointer" />
-      <canvas ref={canvasRef} width={520} height={520} className="wheel-canvas" />
+      <canvas ref={canvasRef} width={640} height={640} className="wheel-canvas" />
     </div>
   )
 })
