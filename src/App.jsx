@@ -116,6 +116,11 @@ export default function App() {
     setWinner(null)
   }
 
+  function returnOne(id) {
+    setLots((prev) => recolor(prev.map((l) => (l.id === id ? { ...l, out: false } : l))))
+    setWinner(null)
+  }
+
   // Accepts JSON ({"lots":[{name,amount}]} or [{name,amount}]) or plain text
   // (one per line, optionally "Название | 100" or "Название 100").
   function parseBulk(text) {
@@ -214,26 +219,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
-        <button
-          className="spin-btn"
-          onClick={handleSpin}
-          disabled={spinning || active.length === 0 || (settings.eliminate && active.length === 1)}
-        >
-          {spinning
-            ? 'Крутится…'
-            : active.length === 0
-              ? 'Нет лотов'
-              : settings.eliminate && active.length === 1
-                ? '🏆 Победитель'
-                : 'КРУТИТЬ'}
-        </button>
         <div className="top-right">
-          <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
-            🖼 Гифка
-          </button>
-          {centerImage && (
-            <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
-          )}
           <label className="switch">
             <input
               type="checkbox"
@@ -242,6 +228,25 @@ export default function App() {
             />
             <span>На выбывание</span>
           </label>
+          <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
+            🖼 Гифка
+          </button>
+          {centerImage && (
+            <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
+          )}
+          <button
+            className="spin-btn"
+            onClick={handleSpin}
+            disabled={spinning || active.length === 0 || (settings.eliminate && active.length === 1)}
+          >
+            {spinning
+              ? 'Крутится…'
+              : active.length === 0
+                ? 'Нет лотов'
+                : settings.eliminate && active.length === 1
+                  ? '🏆 Победитель'
+                  : 'КРУТИТЬ'}
+          </button>
         </div>
       </header>
 
@@ -324,7 +329,11 @@ export default function App() {
                   onBlur={(e) => { if (e.target.value === '' || Number(e.target.value) <= 0) updateAmount(l.id, DEFAULT_AMOUNT) }}
                   title="Стоимость / вес (больше = чаще выпадает)"
                 />
-                {l.out && <span className="tag">выбыл</span>}
+                {l.out && (
+                  <button className="return-btn" onClick={() => returnOne(l.id)} title="Вернуть в колесо">
+                    ↩ вернуть
+                  </button>
+                )}
                 <button className="x" onClick={() => removeLot(l.id)} title="Удалить">✕</button>
               </li>
             ))}

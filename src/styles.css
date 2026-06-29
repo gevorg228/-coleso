@@ -25,10 +25,10 @@ body {
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; flex-wrap: wrap; margin-bottom: 14px;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 10px;
 }
-.topbar h1 { font-size: 26px; margin: 0; flex: 1; }
-.top-right { display: flex; align-items: center; gap: 12px; flex: 1; justify-content: flex-end; }
+.topbar h1 { font-size: 24px; margin: 0; white-space: nowrap; }
+.top-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 
 .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; color: var(--muted); }
 .switch input { width: 18px; height: 18px; accent-color: var(--accent); }
@@ -69,7 +69,7 @@ body {
   display: flex; flex-direction: column; align-items: center; gap: 18px;
   background: transparent; border: 0; padding: 0;
 }
-.wheel-wrap { position: relative; width: 100%; max-width: min(100%, 82vh); margin: 0 auto; }
+.wheel-wrap { position: relative; width: 100%; max-width: min(100%, 86vh); margin: 0 auto; }
 .wheel-canvas { width: 100%; height: auto; display: block; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.45); cursor: pointer; }
 .center-gif {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -88,7 +88,7 @@ body {
 
 .spin-btn {
   flex: none;
-  padding: 12px 40px; font-size: 19px; font-weight: 800; letter-spacing: 1px;
+  padding: 11px 34px; font-size: 18px; font-weight: 800; letter-spacing: 1px;
   color: #fff; border: 0; border-radius: 12px; cursor: pointer;
   background: linear-gradient(135deg, #6366f1, #d946ef);
   box-shadow: 0 8px 24px rgba(99,102,241,0.4);
@@ -162,6 +162,14 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 .lot.out .lot-name { text-decoration: line-through; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
 .tag { font-size: 11px; color: var(--muted); }
+.return-btn {
+  flex: none; font-size: 12px; font-weight: 600; color: #c7d0e6;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 4px 9px; cursor: pointer; white-space: nowrap;
+}
+.return-btn:hover { border-color: #22c55e; color: #86efac; }
+.lot.out { opacity: .6; }
+.lot.out .return-btn { opacity: 1; }
 .x { background: transparent; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px; }
 .x:hover { color: var(--danger); }
 .empty { color: var(--muted); padding: 10px; text-align: center; font-size: 14px; }
