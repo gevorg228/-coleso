@@ -70,7 +70,7 @@ body {
   background: transparent; border: 0; padding: 0;
 }
 .wheel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; position: relative; z-index: 3; }
-.wheel-wrap { position: relative; width: 100%; max-width: min(100%, 78vh); margin: 0 auto; }
+.wheel-wrap { position: relative; width: 100%; max-width: min(100%, calc(100vh - 150px)); margin: 0 auto; }
 .wheel-canvas { width: 100%; height: auto; display: block; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,0.45); cursor: pointer; }
 .center-gif {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -109,8 +109,13 @@ body {
 
 /* panels head */
 .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
-.panel-head h2 { font-size: 16px; margin: 0; }
+.panel-head h2 { font-size: 16px; margin: 0; white-space: nowrap; }
 .head-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* editor: title on its own line, all action buttons in one row below */
+.editor-panel .panel-head { flex-direction: column; align-items: stretch; gap: 10px; }
+.editor-panel .head-actions { flex-wrap: nowrap; }
+.editor-panel .head-actions button { flex: 1; white-space: nowrap; }
 
 button.ghost {
   background: var(--panel-2); color: var(--text);
