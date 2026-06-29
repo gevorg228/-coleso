@@ -181,7 +181,7 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 /* modal */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 50;
-  background: rgba(6, 9, 16, 0.66); backdrop-filter: blur(3px);
+  background: rgba(5, 8, 14, 0.92); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
   animation: fade .15s ease;
 }
