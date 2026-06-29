@@ -83,6 +83,10 @@ export default function App() {
   }, [centerImage])
 
   const active = useMemo(() => lots.filter((l) => !l.out), [lots])
+  const totalWeight = useMemo(
+    () => active.reduce((s, l) => s + (Number(l.amount) || 0), 0),
+    [active]
+  )
 
   function recolor(list) {
     return list.map((l, i) => ({ ...l, color: colorFor(i) }))
@@ -338,6 +342,11 @@ export default function App() {
                   value={l.label}
                   onChange={(e) => updateLot(l.id, e.target.value)}
                 />
+                {!l.out && totalWeight > 0 && (
+                  <span className="lot-pct">
+                    {((Number(l.amount) || 0) / totalWeight * 100).toFixed(1)}%
+                  </span>
+                )}
                 <input
                   className="lot-amount"
                   type="number"

@@ -163,6 +163,7 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
   border-bottom: 1px solid transparent;
 }
 .lot-name { flex: 1; min-width: 0; }
+.lot-pct { flex: none; font-size: 12px; font-weight: 700; color: #9aa6c4; min-width: 42px; text-align: right; }
 .lot-amount {
   width: 56px; flex: none; text-align: right;
   background: var(--bg) !important; border: 1px solid var(--line) !important;
