@@ -221,26 +221,28 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>🎡 Колесо рандома</h1>
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={settings.eliminate}
-            onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
-          />
-          <span>На выбывание</span>
-        </label>
+        <div className="top-right">
+          <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
+            🖼 Гифка
+          </button>
+          {centerImage && (
+            <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
+          )}
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.eliminate}
+              onChange={(e) => setSettings((s) => ({ ...s, eliminate: e.target.checked }))}
+            />
+            <span>На выбывание</span>
+          </label>
+        </div>
       </header>
 
       <div className="layout">
         {/* WHEEL */}
         <section className="panel wheel-panel">
           <div className="wheel-controls">
-            <button className="gif-btn" onClick={() => setGifOpen(true)} title="Гифки в центр колеса">
-              🖼 Гифка
-            </button>
-            {centerImage && (
-              <button className="ghost" onClick={() => setCenterImage(null)} title="Убрать гифку">✕</button>
-            )}
             <button
               className="spin-btn"
               onClick={handleSpin}
