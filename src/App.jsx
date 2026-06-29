@@ -130,20 +130,27 @@ export default function App() {
     const trimmed = text.trim()
     if (!trimmed) return []
     if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      // Try as-is; if that fails, treat it as a comma-separated list of objects
+      // (e.g. { "name": "Сегун", "amount": 50 }, { ... }) by wrapping in [].
+      let data
       try {
-        const data = JSON.parse(trimmed)
-        const arr = Array.isArray(data) ? data : data.lots
-        if (Array.isArray(arr)) {
-          return arr
-            .map((o) => ({
-              label: String(o.name ?? o.label ?? '').trim(),
-              amount: Number(o.amount) > 0 ? Number(o.amount) : DEFAULT_AMOUNT,
-            }))
-            .filter((o) => o.label)
+        data = JSON.parse(trimmed)
+      } catch {
+        try {
+          data = JSON.parse('[' + trimmed.replace(/,\s*$/, '') + ']')
+        } catch (e) {
+          alert('Не получилось разобрать JSON: ' + e.message)
+          return null
         }
-      } catch (e) {
-        alert('Не получилось разобрать JSON: ' + e.message)
-        return null
+      }
+      const arr = Array.isArray(data) ? data : data.lots
+      if (Array.isArray(arr)) {
+        return arr
+          .map((o) => ({
+            label: String(o.name ?? o.label ?? '').trim(),
+            amount: Number(o.amount) > 0 ? Number(o.amount) : DEFAULT_AMOUNT,
+          }))
+          .filter((o) => o.label)
       }
     }
     // plain text lines
@@ -261,7 +268,7 @@ export default function App() {
               <textarea
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
-                placeholder={'Вставьте JSON или текст.\n\nJSON:\n{ "lots": [ {"name":"Сегун","amount":50}, {"name":"Начало","amount":100} ] }\n\nИли по строкам (вес через пробел/|, по умолчанию 100):\nСегун 50\nНачало\nНазад в будущее | 100'}
+                placeholder={'Вставьте список объектов:\n{ "name": "Сегун", "amount": 50 },\n{ "name": "Начало", "amount": 100 }\n\nИли по строкам (вес через пробел/|, по умолчанию 100):\nСегун 50\nНачало\nНазад в будущее | 100'}
                 rows={8}
               />
               <div className="bulk-actions">
