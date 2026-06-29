@@ -259,15 +259,6 @@ export default function App() {
             onRequestSpin={handleSpin}
             centerImage={centerImage}
           />
-
-          {winner && (
-            <div className={'winner-banner' + (winner.kind === 'out' ? ' out' : '')} style={{ borderColor: winner.color }}>
-              {winner.kind === 'survivor' && '🏆 Победитель: '}
-              {winner.kind === 'out' && '❌ Выбывает: '}
-              {winner.kind === 'win' && '🎉 Выпало: '}
-              <b>{winner.label}</b>
-            </div>
-          )}
         </section>
 
         {/* EDITOR */}
@@ -342,6 +333,14 @@ export default function App() {
 
         {/* HISTORY */}
         <section className="panel history-panel">
+          {winner && (
+            <div className={'winner-banner' + (winner.kind === 'out' ? ' out' : '')} style={{ borderColor: winner.color }}>
+              {winner.kind === 'survivor' && '🏆 Победитель: '}
+              {winner.kind === 'out' && '❌ Выбывает: '}
+              {winner.kind === 'win' && '🎉 Выпало: '}
+              <b>{winner.label}</b>
+            </div>
+          )}
           <div className="panel-head">
             <h2>История ({history.length})</h2>
             <button
