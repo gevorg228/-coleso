@@ -10,14 +10,32 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
   const rafRef = useRef(0)
   const [spinning, setSpinning] = useState(false)
 
+  // Cumulative angles based on each segment's weight (amount).
+  function weights() {
+    const w = segments.map((s) => Math.max(0.0001, Number(s.amount) || 0))
+    const total = w.reduce((a, b) => a + b, 0)
+    let acc = 0
+    // returns [{start, end, mid}] in radians for each segment
+    return w.map((weight) => {
+      const span = (weight / total) * TAU
+      const start = acc
+      acc += span
+      return { start, end: acc, mid: start + span / 2 }
+    })
+  }
+
   useImperativeHandle(ref, () => ({
     spin() {
       if (spinning || segments.length === 0) return
-      const n = segments.length
-      const seg = TAU / n
-      const winner = Math.floor(Math.random() * n)
+      const arcs = weights()
+      // Weighted winner pick.
+      const w = segments.map((s) => Math.max(0.0001, Number(s.amount) || 0))
+      const total = w.reduce((a, b) => a + b, 0)
+      let r = Math.random() * total
+      let winner = 0
+      for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) { winner = i; break } }
       // Put the chosen segment centre under the pointer at the top (-PI/2).
-      const targetBase = -Math.PI / 2 - (winner + 0.5) * seg
+      const targetBase = -Math.PI / 2 - arcs[winner].mid
       const current = rotationRef.current
       const turns = 5 + Math.floor(Math.random() * 3)
       // Normalise so we always rotate forward by `turns` full spins then settle.
@@ -66,11 +84,12 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
       return
     }
 
-    const seg = TAU / n
+    const arcs = weights()
     const rot = rotationRef.current
     for (let i = 0; i < n; i++) {
-      const a0 = rot + i * seg
-      const a1 = a0 + seg
+      const a0 = rot + arcs[i].start
+      const a1 = rot + arcs[i].end
+      const span = arcs[i].end - arcs[i].start
       ctx.beginPath()
       ctx.moveTo(cx, cy)
       ctx.arc(cx, cy, r, a0, a1)
@@ -84,14 +103,14 @@ const Wheel = forwardRef(function Wheel({ segments, onResult, duration = 4500 },
       // label
       ctx.save()
       ctx.translate(cx, cy)
-      ctx.rotate(a0 + seg / 2)
+      ctx.rotate(a0 + span / 2)
       ctx.textAlign = 'right'
       ctx.textBaseline = 'middle'
       ctx.fillStyle = '#fff'
-      const fs = Math.max(11, Math.min(22, (r * 0.9) / Math.max(6, n) + 8))
+      const fs = Math.max(10, Math.min(22, span * r * 0.5 + 9))
       ctx.font = `600 ${fs}px system-ui, sans-serif`
       let label = segments[i].label
-      const maxLen = n > 16 ? 10 : 18
+      const maxLen = Math.max(6, Math.round(span * 26))
       if (label.length > maxLen) label = label.slice(0, maxLen - 1) + '…'
       ctx.shadowColor = 'rgba(0,0,0,0.4)'
       ctx.shadowBlur = 3

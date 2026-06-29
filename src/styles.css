@@ -118,11 +118,18 @@ button.ghost.danger:hover { border-color: var(--danger); color: #fca5a5; }
 .lot { display: flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; }
 .lot.out { opacity: .45; }
 .lot input {
-  flex: 1; background: transparent; border: 0; color: var(--text); font-size: 14px; padding: 4px;
+  background: transparent; border: 0; color: var(--text); font-size: 14px; padding: 4px;
   border-bottom: 1px solid transparent;
 }
+.lot-name { flex: 1; min-width: 0; }
+.lot-amount {
+  width: 56px; flex: none; text-align: right;
+  background: var(--bg) !important; border: 1px solid var(--line) !important;
+  border-radius: 7px; color: #fbbf24 !important; font-weight: 600;
+}
+.lot-amount::-webkit-inner-spin-button { opacity: .4; }
 .lot input:focus { outline: none; border-bottom-color: var(--accent); }
-.lot.out input { text-decoration: line-through; }
+.lot.out .lot-name { text-decoration: line-through; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
 .tag { font-size: 11px; color: var(--muted); }
 .x { background: transparent; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px; }
